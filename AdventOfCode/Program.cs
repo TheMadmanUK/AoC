@@ -7,8 +7,8 @@ namespace AdventOfCode
         static void Main(string[] args)
         {
             //Run2015();
-            //Run2019();
-            Run2020();
+            Run2019();
+            //Run2020();
         }
 
         private static void Run2015()
@@ -39,6 +39,8 @@ namespace AdventOfCode
             Console.WriteLine($"2019:02:2 - {_2019.Day02.RunPart2()}");
             Console.WriteLine($"2019:03:1 - {_2019.Day03.RunPart1()}");
             Console.WriteLine($"2019:03:2 - {_2019.Day03.RunPart2()}");
+            Console.WriteLine($"2019:04:1 - {_2019.Day04.RunPart1()}");
+            Console.WriteLine($"2019:04:2 - {_2019.Day04.RunPart2()}");
         }
 
         private static void Run2020()
