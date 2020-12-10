@@ -7,15 +7,14 @@ namespace AdventOfCode._2019
 {
     public class IntCode
     {
-        public IntcodeCode Code { get; private set; }
-        private readonly IntcodeCode _baseCode;
-        private IEnumerator<long> _isRunning;
+        public Memory Code { get; private set; }
+        private readonly Memory _baseCode;
 
         public IntCode(string codeFile) : this(File.ReadAllText(codeFile).Split(",").Select(long.Parse).ToList()) { }
 
         public IntCode(IReadOnlyList<long> baseCode)
         {
-            _baseCode = new IntcodeCode();
+            _baseCode = new Memory();
             for (var i = 0; i < baseCode.Count; i++)
             {
                 _baseCode.Add(i, baseCode[i]);
@@ -33,55 +32,104 @@ namespace AdventOfCode._2019
         public void Reset()
         {
             Code = _baseCode.Copy();
-            _isRunning?.Dispose();
-            _isRunning = null;
         }
 
-        public void RunCode()
+        public IEnumerable<long> RunCode()
         {
-            var sp = 0;
+            return RunCode(new List<long>());
+        }
+
+        public IEnumerable<long> RunCode(int input)
+        {
+            return RunCode(new List<long> { input });
+        }
+
+        public IEnumerable<long> RunCode(List<long> input)
+        {
+            var ptr = 0;
+            var inptr = 0;
 
             while (true)
             {
-                switch (Code[sp])
+                var instruction = (int)Code[ptr] % 100;
+                var mode1 = (int)Code[ptr] / 100 % 10;
+                var mode2 = (int)Code[ptr] / 1000 % 10;
+                var mode3 = (int)Code[ptr] / 10000;
+
+                switch (instruction)
                 {
-                    case 1:
-                        var val1 = Code.GetValue(Code[sp + 1]);
-                        var val2 = Code.GetValue(Code[sp + 2]);
-                        Code.WriteValue(Code[sp + 3], val1 + val2);
-                        sp += 4;
+                    case 1: // ADD
+                        var val1 = Code.GetValue(Code[ptr + 1], mode1);
+                        var val2 = Code.GetValue(Code[ptr + 2], mode2);
+                        Code.WriteValue(Code[ptr + 3], val1 + val2);
+                        ptr += 4;
                         break;
 
-                    case 2:
-                        val1 = Code.GetValue(Code[sp + 1]);
-                        val2 = Code.GetValue(Code[sp + 2]);
-                        Code.WriteValue(Code[sp + 3], val1 * val2);
-                        sp += 4;
+                    case 2: // MULT
+                        val1 = Code.GetValue(Code[ptr + 1], mode1);
+                        val2 = Code.GetValue(Code[ptr + 2], mode2);
+                        Code.WriteValue(Code[ptr + 3], val1 * val2);
+                        ptr += 4;
+                        break;
+
+                    case 3: // INPUT
+                        if (!input.Any()) throw new Exception("Cannot read from empty input");
+                        if (inptr >= input.Count) throw new Exception($"No input value in position {inptr}");
+                        Code.WriteValue(Code[ptr + 1], input[inptr]);
+                        inptr++;
+                        ptr += 2;
+                        break;
+
+                    case 4: // OUTPUT
+                        yield return Code.GetValue(Code[ptr + 1], mode1);
+                        ptr += 2;
+                        break;
+
+                    case 5: // JUMP-IF-TRUE
+                        ptr = Code.GetValue(Code[ptr + 1], mode1) != 0 ? (int)Code.GetValue(Code[ptr + 2], mode2) : ptr + 3;
+                        break;
+
+                    case 6: // JUMP-IF-FALSE
+                        ptr = Code.GetValue(Code[ptr + 1], mode1) == 0 ? (int)Code.GetValue(Code[ptr + 2], mode2) : ptr + 3;
+                        break;
+
+                    case 7: // LESS-THAN
+                        Code.WriteValue(Code[ptr + 3], Code.GetValue(Code[ptr + 1], mode1) < Code.GetValue(Code[ptr + 2], mode2) ? 1 : 0);
+                        ptr += 4;
+                        break;
+
+                    case 8: // EQUALS
+                        Code.WriteValue(Code[ptr + 3], Code.GetValue(Code[ptr + 1], mode1) == Code.GetValue(Code[ptr + 2], mode2) ? 1 : 0);
+                        ptr += 4;
                         break;
 
                     case 99:
-                        return;
+                        yield break;
 
                     default:
-                        throw new Exception($"Invalid code in position {sp}: {Code[sp]}");
+                        throw new Exception($"Invalid code in position {ptr}: {Code[ptr]}");
                 }
             }
         }
     }
 
-    public class IntcodeCode : Dictionary<long, long>
+    public class Memory : Dictionary<long, long>
     {
-        public IntcodeCode() { }
-        public IntcodeCode(IDictionary<long, long> dictionary) : base(dictionary) { }
+        public Memory() { }
+        public Memory(IDictionary<long, long> dictionary) : base(dictionary) { }
 
-        public IntcodeCode Copy()
+        public Memory Copy()
         {
-            return new IntcodeCode(this.ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
+            return new Memory(this.ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
         }
 
-        public long GetValue(long pos)
+        public long GetValue(long value, int mode)
         {
-            return ContainsKey(pos) ? this[pos] : 0;
+            return mode switch
+            {
+                1 => value,
+                _ => ContainsKey(value) ? this[value] : 0
+            };
         }
 
         public void WriteValue(long pos, long value)
