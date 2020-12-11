@@ -7,8 +7,8 @@ namespace AdventOfCode
         static void Main(string[] args)
         {
             //Run2015();
-            Run2019();
-            //Run2020();
+            //Run2019();
+            Run2020();
         }
 
         private static void Run2015()
@@ -43,6 +43,10 @@ namespace AdventOfCode
             Console.WriteLine($"2019:04:2 - {_2019.Day04.RunPart2()}");
             Console.WriteLine($"2019:05:1 - {_2019.Day05.RunPart1()}");
             Console.WriteLine($"2019:05:2 - {_2019.Day05.RunPart2()}");
+            Console.WriteLine($"2019:06:1 - {_2019.Day06.RunPart1()}");
+            Console.WriteLine($"2019:06:2 - {_2019.Day06.RunPart2()}");
+            Console.WriteLine($"2019:07:1 - {_2019.Day07.RunPart1()}");
+            //Console.WriteLine($"2019:07:2 - {_2019.Day07.RunPart2()}");
         }
 
         private static void Run2020()
@@ -67,6 +71,8 @@ namespace AdventOfCode
             Console.WriteLine($"2020:09:2 - {_2020.Day09.RunPart2()}");
             Console.WriteLine($"2020:10:1 - {_2020.Day10.RunPart1()}");
             Console.WriteLine($"2020:10:2 - {_2020.Day10.RunPart2()}");
+            Console.WriteLine($"2020:11:1 - {_2020.Day11.RunPart1()}");
+            Console.WriteLine($"2020:11:2 - {_2020.Day11.RunPart2()}");
         }
     }
 }
