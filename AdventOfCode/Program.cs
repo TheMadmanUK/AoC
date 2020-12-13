@@ -75,6 +75,8 @@ namespace AdventOfCode
             Console.WriteLine($"2020:11:2 - {_2020.Day11.RunPart2()}");
             Console.WriteLine($"2020:12:1 - {_2020.Day12.RunPart1()}");
             Console.WriteLine($"2020:12:2 - {_2020.Day12.RunPart2()}");
+            Console.WriteLine($"2020:13:1 - {_2020.Day13.RunPart1()}");
+            Console.WriteLine($"2020:13:2 - {_2020.Day13.RunPart2()}");
         }
     }
 }
